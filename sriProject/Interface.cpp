@@ -19,9 +19,13 @@ int Interface::executeCommand(string command){
     else if(query.command.compare("Dump")) ops.Dump(query.file);
     else if(query.command.compare("Load")) ops.Load(query.file);
     else if(query.command.compare("Inference")) ops.Inference(query);
+    
+    
 }
 
 int Interface::Add(Query query){
+    
+    
     
 }
 
