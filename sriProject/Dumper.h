@@ -9,7 +9,7 @@ private:
 public:
     Dumper();
     ~Dumper();
-    dump(string file);
+    void dump(string file);
     
 };
 

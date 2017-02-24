@@ -10,7 +10,7 @@ int main() {
 
     string command;
     while (command != "EXIT"){
-
+        string transaction;
         cout << "$> ";
         getline(cin , transaction);
         interface.executeCommand(command);
