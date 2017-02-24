@@ -7,7 +7,7 @@ int KnowledgeBase::AddFact(Query query){
     
 }
 
-int KnowledgeBase::RemoveFact(){
+int KnowledgeBase::RemoveFact(Query query){
     
 }
 

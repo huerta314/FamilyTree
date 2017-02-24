@@ -5,15 +5,16 @@
 using namespace std;
 
 int main() {
+    
+    Interface interface;
 
-    string transactionCommand, transaction;
-    while (transactionCommand != "EXIT"){
+    string command;
+    while (command != "EXIT"){
 
         cout << "$> ";
-        cin >> transactionCommand;
         getline(cin , transaction);
-
-        cout << transactionCommand << transaction << endl;
+        interface.executeCommand(command);
+        
 
     }
 
