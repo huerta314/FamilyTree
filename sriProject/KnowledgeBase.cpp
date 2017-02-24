@@ -16,7 +16,7 @@ int KnowledgeBase::AddFact(Query query){
     
     for(int i = 0; i < sizeOfParams; i++){
         
-        tempSecondParams->insert(query.parameters.front());
+        tempSecondParams->push_back(query.parameters.front());
         query.parameters.pop();
     }
     
