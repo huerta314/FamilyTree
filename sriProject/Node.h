@@ -15,13 +15,18 @@ private:
 
 	string name;
 
-	vector<Edge*> edges;
+	vector<Edge*> myEdges;
 
 public:
 
 
 	int setName();
 	string getName();
+	
+	void addEdge(Edge* edge);
+	vector<Edge*>* getEdgeList();
+	
+	
 	
 	Node(); //Make sure to follow rule of 5
 	~Node(); //Take care of Edge*

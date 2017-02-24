@@ -6,15 +6,42 @@
 class Parser{
 
 private:
+    /*Might have to have this defined in the header cause apparently templates can only be defined in header :/
+    template <typename Container>
+    Container& split(
+        Container&                            result,
+        const typename Container::value_type& s,
+        const typename Container::value_type& delimiters,
+        split::empties_t                      empties = split::empties_ok )
+    {
+        result.clear();
+        size_t current;
+        size_t next = -1;
+        do
+    {
+        if (empties == 0)
+        {
+          next = s.find_first_not_of( delimiters, next + 1 );
+          if (next == Container::value_type::npos) break;
+          next -= 1;
+        }
+        current = next + 1;
+        next = s.find_first_of( delimiters, current );
+        result.push_back( s.substr( current, next - current ) );
+    }
+    while (next != Container::value_type::npos);
+    return result;
+}*/
 
     //parse public method will decide which one of these to call.
                                         //From page 4 of assignment pdf
-    Query parseDump(string input);      //DUMP updated_family_relation.sri 
-    Query parseFact(string input);      //FACT Father(Roger,John) 
-    Query parseInference(string input); //INFERENCE GrandFather($X,$Y)
-    Query parseLoad(string input);      //LOAD file.sri
-    Query parseRule(string input);      //RULE Parent($X,$Y):- OR Father($X,$Y) Mother($X,$Y)
-    Query parseDrop(string input);      //DROP Parent # delete the Parent rule 
+    Query& parseDump(vector<string> input);      //DUMP updated_family_relation.sri 
+    Query& parseFact(vector<string> input);      //FACT Father(Roger,John) 
+    Query& parseInference(vector<string> input); //INFERENCE GrandFather($X,$Y)
+    Query& parseLoad(vector<string> input);      //LOAD file.sri
+    Query& parseRule(vector<string> input);      //RULE Parent($X,$Y):- OR Father($X,$Y) Mother($X,$Y)
+    Query& parseDrop(vector<string> input);      //DROP Parent # delete the Parent rule 
+    
     
 
     /*
@@ -25,7 +52,7 @@ private:
 
 public:
     Parser();
-    Query parse(string input, int& error);  //When calling parse, user will pass reference to an integer. If error we will return by reference
+    Query& parse(string input);  //Parse should throw an error to catch
     
     
     

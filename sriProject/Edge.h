@@ -17,13 +17,20 @@ private:
 
 public:
 
-	int setName(string n); //set n to factName
-	string getName(); //get factName
+	int setFactName(string n); //set n to factName
+	string getFactName(); //get factName
+	
+	void setNextName(Node* node);
+	Node* getNextName();
+	
 
 	Edge();
-	Edge(string n, Node* np);
+	
+	
 	//copy constructor, move constructor, assignment operator
-	Edge(Edge& other);
+	/*Edge(Edge& other);
+	Edge(string n, Node* np);*/
+	
 
 	~Edge();
 		

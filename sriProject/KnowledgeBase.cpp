@@ -1,9 +1,14 @@
 /* KnowledgeBase.cpp */
 #include "KnowledgeBase.h"
 
-KnowledgeBase::KnowledgeBase(){}
+KnowledgeBase::KnowledgeBase(){
+    
+}
+
+int find(Node* masterN, string )
 
 int KnowledgeBase::AddFact(Query query){
+    int numberNewNodes = parameters.size();
     
 }
 

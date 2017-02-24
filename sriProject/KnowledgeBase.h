@@ -6,7 +6,7 @@
 
 class KnowledgeBase{
 
-	friend class Node;
+	//friend class Node;
 
 private:
 	Node masterNode;
