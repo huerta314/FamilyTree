@@ -20,8 +20,8 @@ public:
 	int Remove(Query query);
 
 	int Inference(Query query);
-	int Dump(Query query);
-	int Load(Query query);
+	int Dump(string file);
+	int Load(string file);
 	~QueryOperations();
 };
 #endif

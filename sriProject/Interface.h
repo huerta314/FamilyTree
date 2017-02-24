@@ -19,7 +19,7 @@ class Interface {
 private:
 
 	Parser parser;
- 	QueryOperations queryOperations;	
+ 	QueryOperations ops;	
 
 
 	int Add(Query query);

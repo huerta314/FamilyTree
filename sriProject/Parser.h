@@ -2,6 +2,7 @@
 #define PARSER_H_
 //Work in progress
 //Added contructor and parse function but don't know if thats the proper return value - Trevor
+#include "Query.h"
 class Parser{
 
 private:

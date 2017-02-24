@@ -14,7 +14,7 @@ private:
 public:
 
 	int AddFact(Query query);
-	int RemoveFact();
+	int RemoveFact(Query query);
 	int QueryFact(Query query);
 	
 	KnowledgeBase();

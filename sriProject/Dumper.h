@@ -7,7 +7,9 @@ private:
     
 
 public:
-    
+    Dumper();
+    ~Dumper();
+    dump(string file);
     
 };
 
