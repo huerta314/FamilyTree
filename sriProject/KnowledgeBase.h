@@ -1,6 +1,9 @@
 #ifndef KNOWLEDGE_BASE_H_
 #define KNOWLEDGE_BASE_H_
 
+#include <string>
+#include <map>
+#include <vector>
 
 
 #include "Node.h"

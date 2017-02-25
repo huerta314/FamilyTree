@@ -1,10 +1,8 @@
-sriProject: main.cpp Dumper.cpp Edge.cpp Interface.cpp KnowledgeBase.cpp Node.cpp Parser.cpp QueryOperations.cpp RuleBase.cpp
+sriProject: main.cpp Dumper.cpp Interface.cpp KnowledgeBase.cpp Parser.cpp QueryOperations.cpp RuleBase.cpp
 	g++ main.cpp				\
 	Dumper.cpp					\
-	Edge.cpp					\
 	Interface.cpp				\
 	KnowledgeBase.cpp			\
-	Node.cpp					\
 	Parser.cpp					\
 	QueryOperations.cpp 		\
 	RuleBase.cpp				\

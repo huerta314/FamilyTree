@@ -61,7 +61,7 @@ Query& Parser::parse(string input){
 
 //Index 0 is the command name
 //Index 1 is the file name
-Query& Parser::parseDump(vector<string> input, Query query){
+Query& Parser::parseDump(vector<string> input, Query& query){
     query.file = input[1];
     return query;
 }
@@ -69,7 +69,7 @@ Query& Parser::parseDump(vector<string> input, Query query){
 //Index 0 is the command name
 //Index 1 is the name of the fact to be added
 //Rest of the indices are parameters for the fact
-Query& Parser::parseFact(vector<string> input, Query query){
+Query& Parser::parseFact(vector<string> input, Query& query){
     query.ident = "Fact";
     query.name = input[1];
     for(int i = 2; i < input.size(); i++){
@@ -81,7 +81,7 @@ Query& Parser::parseFact(vector<string> input, Query query){
 //Index 0 is the command name
 //Index 1 is the name of the rule or fact to be searched
 //Rest of the indices are parameters
-Query& Parser::parseInference(vector<string> input, Query query){
+Query& Parser::parseInference(vector<string> input, Query& query){
     query.name = input[1];
     for(int i = 2; i < input.size(); i++){
         query.parameters.push(input[i]);
@@ -89,7 +89,7 @@ Query& Parser::parseInference(vector<string> input, Query query){
     return query;
 }
 
-Query& Parser::parseLoad(vector<string> input, Query query){
+Query& Parser::parseLoad(vector<string> input, Query& query){
     query.file = input[1];
     return query;
 }
@@ -99,7 +99,7 @@ Query& Parser::parseLoad(vector<string> input, Query query){
 //The first portion is the name of the rule and its parameters
 //The second portion is the AND or OR operator
 //The last two portions are the rules/facts that make up the rule
-Query& Parser::parseRule(vector<string> input, Query query){
+Query& Parser::parseRule(vector<string> input, Query& query){
     query.ident = "Rule";
     query.name  = input[1];
     queue<string> temp;                         //Temoporary string queue to hold the parameters for the rule definition
@@ -123,7 +123,8 @@ Query& Parser::parseRule(vector<string> input, Query query){
         }
         else if(j == 4){
             query.ruleParamName[1] = input[i];  //Sets the name of the second parameter and empties out the temp queue
-            queue<string> empty.swap(temp);
+            queue<string> empty;
+            empty.swap(temp);
             j++;
         }
         else if(j == 5){
@@ -131,11 +132,12 @@ Query& Parser::parseRule(vector<string> input, Query query){
             else    query.ruleParams.push(temp);
         }
     }
+    return query;
 }
 
 //Index 0 is the command name
 //The rest of the indices is the name of the facts or rules to drop
-Query& Parser::parseDrop(vector<string> input, Query query){
+Query& Parser::parseDrop(vector<string> input, Query& query){
     for(int i = 1; i < input.size(); i++){
         query.parameters.push(input[i]);
     }
