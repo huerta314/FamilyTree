@@ -110,10 +110,20 @@ int KnowledgeBase::RemoveFact(Query query){
     
 }
 bool KnowledgeBase::doesFactExist(Query query){
-    
-    
+
+    map<string, deque<Query> >::iterator it;
+    it = knowledgeContainer.find(query.name);
+    if (it == knowledgeContainer.end() ){
+        
+        return false;
+    }else {
+        
+        return true;
+    }
 }
-int KnowledgeBase::QueryFact(Query query){
+int QueryFact(Query query, deque<Query>& inputDeque){
+    
+    
     
     
 }

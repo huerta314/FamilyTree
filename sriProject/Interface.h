@@ -21,6 +21,7 @@ private:
 	Parser parser;
  	QueryOperations ops;	
 	int Load(Query query);
+	void print(vector<Query> queries);
 
 
 public:

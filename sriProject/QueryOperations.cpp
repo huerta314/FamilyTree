@@ -24,7 +24,19 @@ int QueryOperations::Inference(Query query){
     1. check each rule that matches the query name
     2. process rules to create temporary facts of given type
     3. if the user enters a name for temporary rules, then save*/
-    kb.QueryFact(query.name)
+    
+    bool doesFactExist = kb.doesFactExist(query.name);
+    if (doesFactExist == false){ //no facts in kb, try the rule base
+        
+        bool doesRuleExist = rb.doesRuleExist();
+        if (doesRuleExist == false){
+            
+            return 0; //for no inference found
+        }
+    }else {
+        
+        kb.QueryFact(query);
+    }
     
 }
 

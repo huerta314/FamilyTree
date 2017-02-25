@@ -20,16 +20,21 @@ int Interface::executeCommand(string command){
     else if(query.command.compare("LOAD") == 0) Load(query);
     else if(query.command.compare("INFERENCE") == 0) ops.Inference(query);
 }
-
 int Interface::Load(Query query){
     string line;
     ifstream file(query.file);
     if(file.is_open()){
-        while(getline(file,line)){
+        while(getling(file,line)){
             executeCommand(line);
         }
     }
     file.close();
+}
+
+void Interface::print(vector<Query> queries){
+    for(int i = 0; i < queries.size(); i++){
+        cout<<queries[i]<<endl;
+    }
 }
 
 Interface::~Interface(){}

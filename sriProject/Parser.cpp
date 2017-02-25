@@ -84,6 +84,7 @@ Query& Parser::parseFact(vector<string> input, Query& query){
 Query& Parser::parseInference(vector<string> input, Query& query){
     query.name = input[1];
     for(int i = 2; i < input.size(); i++){
+        if(input[i][0] == '$') query.flag = 1;
         query.parameters.push_back(input[i]);
     }
     return query;

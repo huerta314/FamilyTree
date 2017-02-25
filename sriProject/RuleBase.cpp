@@ -28,6 +28,19 @@ int RuleBase::RemoveRule(Query query){
     }
     
 }
+
+bool RuleBase::doesRuleExist(Query query){
+    
+    map<string, deque<Query> >::iterator it;
+    it = knowledgeContainer.find(query.name);
+    if (it == knowledgeContainer.end() ){
+        
+        return false;
+    }else {
+        
+        return true;
+    }
+}
 int RuleBase::QueryRule(Query query){
     
     

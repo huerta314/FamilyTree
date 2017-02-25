@@ -22,10 +22,7 @@ struct Query{
 	string					file;			//Name of the file to output/load
 	
 	Query():flag(0){}						//Default constructor to set the flag to 0
-	//to perform inference query
-	//Kind of redundant can just use the parameters queue for inference
-	//queue<string> inferenceQueue;	//father, $x, $y AND ....
-
+	friend ostream &operator<<( ostream &output, const Query query );
 };
 
 
