@@ -3,7 +3,7 @@
 
 #include <string>
 #include <map>
-#include <vector>
+#include <deque>
 
 
 #include "Node.h"
@@ -18,13 +18,16 @@ class KnowledgeBase{
 
 	
 private:
-	map<string, map<string, vector<string> > > knowledgeContainer;
+//	map<string, map<string, vector<string> > > knowledgeContainer;
+
+	map<string, deque<Query> > knowledgeContainer;
 	
 public:
 
 	int AddFact(Query query);
 	int RemoveFact(Query query);
 	int QueryFact(Query query);
+	bool doesFactExist(Query query);
 	
 	KnowledgeBase();
 

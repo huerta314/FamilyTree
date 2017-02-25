@@ -6,6 +6,8 @@ using namespace std;
 Parser::Parser(){}
 
 //Split function needed to split the input into seperate tokens
+//Split function found here
+//http://www.cplusplus.com/faq/sequences/strings/split/
 template <typename Container>
 Container& split(
   Container&                            result,
@@ -71,7 +73,7 @@ Query& Parser::parseFact(vector<string> input, Query& query){
     query.ident = "FACT";
     query.name = input[1];
     for(int i = 2; i < input.size(); i++){
-        query.parameters.push(input[i]);
+        query.parameters.push_back(input[i]);
     }
     return query;
 }
@@ -82,7 +84,7 @@ Query& Parser::parseFact(vector<string> input, Query& query){
 Query& Parser::parseInference(vector<string> input, Query& query){
     query.name = input[1];
     for(int i = 2; i < input.size(); i++){
-        query.parameters.push(input[i]);
+        query.parameters.push_back(input[i]);
     }
     return query;
 }
@@ -100,12 +102,12 @@ Query& Parser::parseLoad(vector<string> input, Query& query){
 Query& Parser::parseRule(vector<string> input, Query& query){
     query.ident = "RULE";
     query.name  = input[1];
-    queue<string> temp;                         //Temoporary string queue to hold the parameters for the rule definition
+    deque<string> temp;                         //Temoporary string queue to hold the parameters for the rule definition
     int j       = 0;                            //A counter to keep track of what part of the input we are on
     for(int i = 2; i < input.size(); i++){
         if(j == 0){
             if(input[i].compare(":-") == 0) j++;     //If the end of the parameters for the rule name is done go to the next portion
-            else    query.parameters.push(input[i]);
+            else    query.parameters.push_back(input[i]);
         }
         else if(j == 1){
             query.ruleIdent = input[i];         //The next part is the AND or OR operator
@@ -116,28 +118,30 @@ Query& Parser::parseRule(vector<string> input, Query& query){
             j++;
         }
         else if(j == 3){
-            if(input[i][0] == '$')  temp.push(input[i]);//Adds the parameters of the first fact/rule to a temp queue and adds it when it reaches the end
+            if(input[i][0] == '$')  temp.push_back(input[i]);//Adds the parameters of the first fact/rule to a temp queue and adds it when it reaches the end
             else{    
                 query.ruleParamName[1] = input[i];  //Sets the name of the second parameter and empties out the temp queue
-                query.ruleParams.push(temp); 
-                queue<string> empty;
+                query.ruleParams.push_back(temp); 
+                deque<string> empty;
                 empty.swap(temp);
                 j++;
             }
         }
         else if(j == 4){
-            if(input[i][0] == '$')  temp.push(input[i]);//Adds the parameters for the second fact/rule to the temp queue and will add it to the query object
+            if(input[i][0] == '$')  temp.push_back(input[i]);//Adds the parameters for the second fact/rule to the temp queue and will add it to the query object
         }
     }
-    query.ruleParams.push(temp);
+    query.ruleParams.push_back(temp);
     return query;
 }
 
 //Index 0 is the command name
 //The rest of the indices is the name of the facts or rules to drop
 Query& Parser::parseDrop(vector<string> input, Query& query){
-    for(int i = 1; i < input.size(); i++){
-        query.parameters.push(input[i]);
+    query.name = input[1];
+    for(int i = 2; i < input.size(); i++){
+        if(input[i][0] == '$') query.flag = 1;
+        query.parameters.push_back(input[i]);
     }
     return query;
 }

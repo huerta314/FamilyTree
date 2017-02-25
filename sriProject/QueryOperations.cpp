@@ -14,13 +14,17 @@ int QueryOperations::Add(Query query){
 }
 
 int QueryOperations::Remove(Query query){
-    if(query.ident.compare("FACT") == 0) 
-        kb.RemoveFact(query);
-    else if (query.ident.compare("RULE") == 0) //explicity comparison
-        rb.RemoveRule(query);
+    kb.RemoveFact(query);
+    rb.RemoveRule(query);
 }
 
 int QueryOperations::Inference(Query query){
+    
+    /*
+    1. check each rule that matches the query name
+    2. process rules to create temporary facts of given type
+    3. if the user enters a name for temporary rules, then save*/
+    kb.QueryFact(query.name)
     
 }
 

@@ -17,30 +17,19 @@ int Interface::executeCommand(string command){
     if( (query.command.compare("FACT") == 0) || (query.command.compare("RULE") == 0) ) ops.Add(query);
     else if(query.command.compare("DROP") == 0) ops.Remove(query);
     else if(query.command.compare("DUMP") == 0) ops.Dump(query);
-    else if(query.command.compare("LOAD") == 0) ops.Load(query);
+    else if(query.command.compare("LOAD") == 0) Load(query);
     else if(query.command.compare("INFERENCE") == 0) ops.Inference(query);
 }
 
-int Interface::Add(Query query){
-    
-    
-    
-}
-
-int Interface::Remove(Query query){
-    
-}
-
-int Interface::Dump(Query query){
-    
-}
-
 int Interface::Load(Query query){
-    
-}
-
-int Interface::Inference(Query query){
-    
+    string line;
+    ifstream file(query.file);
+    if(file.is_open()){
+        while(getline(file,line)){
+            executeCommand(line);
+        }
+    }
+    file.close();
 }
 
 Interface::~Interface(){}

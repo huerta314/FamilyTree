@@ -2,7 +2,7 @@
 #define RULEBASE_H_
 
 #include <map>
-#include <vector>
+#include <deque>
 #include <string>
 
 #include "Query.h"
@@ -15,7 +15,7 @@ class RuleBase{
 
 
 private:
-	map<string, vector<string> > ruleContainer;
+	map<string, deque<Query> > ruleContainer;
 
 public:
 	int AddRule(Query query);

@@ -20,22 +20,13 @@ private:
 
 	Parser parser;
  	QueryOperations ops;	
-
-
-	int Add(Query query);
-	int Remove(Query query);
-
-	int Dump(Query query); //dumper object called here		
 	int Load(Query query);
-	int Inference(Query query); //Worry about it last
 
 
 public:
 
 	Interface();
 	~Interface();
-
-
 	//returns int : error value 
 	int executeCommand(string command);	
 
