@@ -7,16 +7,16 @@ QueryOperations::QueryOperations(){
 
 int QueryOperations::Add(Query query){
     //Check if its a fact or rule and send it to the proper knowledge rule base
-    if(query.ident.compare("Fact")) 
+    if(query.ident.compare("FACT") == 0) 
         kb.AddFact(query);
-    else    
+    else if (query.ident.compare("RULE") == 0) 
         rb.AddRule(query);
 }
 
 int QueryOperations::Remove(Query query){
-    if(query.ident.compare("Fact")) 
+    if(query.ident.compare("FACT") == 0) 
         kb.RemoveFact(query);
-    else 
+    else if (query.ident.compare("RULE") == 0) //explicity comparison
         rb.RemoveRule(query);
 }
 

@@ -1,14 +1,11 @@
 #include "Parser.h"
-#include "Query.h"
-#include <iostream>
-#include <cstddef>
-#include <vector>
-#include <deque>
-#include <queue>
+
 
 using namespace std;
 
 Parser::Parser(){}
+
+//Split function needed to split the input into seperate tokens
 template <typename Container>
 Container& split(
   Container&                            result,
@@ -32,8 +29,9 @@ Container& split(
   return result;
 }
 
-Query& Parser::parse(string input){
+Query Parser::parse(string input){
     Query query;
+    
     vector <string> params;
     //Split input into the a vector each split by whitespace commas and parenthesis
     split(params, input, " ,()");
@@ -42,17 +40,17 @@ Query& Parser::parse(string input){
     //and give it to the right parse command passing the rest of the parameters.
     //Could probably try catch an error here for unknown command
     query.command = params[0];
-    if(query.command.compare("Fact"))
-        parseFact(params query);
-    else if(query.command.compare("Rule"))
+    if(query.command.compare("FACT") == 0)
+        parseFact(params, query);
+    else if(query.command.compare("RULE") == 0)
         parseRule(params, query);
-    else if(query.command.compare("Dump"))
+    else if(query.command.compare("DUMP") == 0)
         parseDump(params, query);
-    else if(query.command.compare("Drop"))
+    else if(query.command.compare("DROP") == 0)
         parseDrop(params, query);
-    else if(query.command.compare("Load"))
+    else if(query.command.compare("LOAD") == 0)
         parseLoad(params, query);
-    else if(query.command.compare("Inference"))
+    else if(query.command.compare("INFERENCE") == 0)
         parseInference(params, query);
     else
         cout<<"Throw error here or something"<<endl;
@@ -70,7 +68,7 @@ Query& Parser::parseDump(vector<string> input, Query& query){
 //Index 1 is the name of the fact to be added
 //Rest of the indices are parameters for the fact
 Query& Parser::parseFact(vector<string> input, Query& query){
-    query.ident = "Fact";
+    query.ident = "FACT";
     query.name = input[1];
     for(int i = 2; i < input.size(); i++){
         query.parameters.push(input[i]);
@@ -100,13 +98,13 @@ Query& Parser::parseLoad(vector<string> input, Query& query){
 //The second portion is the AND or OR operator
 //The last two portions are the rules/facts that make up the rule
 Query& Parser::parseRule(vector<string> input, Query& query){
-    query.ident = "Rule";
+    query.ident = "RULE";
     query.name  = input[1];
     queue<string> temp;                         //Temoporary string queue to hold the parameters for the rule definition
     int j       = 0;                            //A counter to keep track of what part of the input we are on
     for(int i = 2; i < input.size(); i++){
         if(j == 0){
-            if(input[i].compare(":-")) j++;     //If the end of the parameters for the rule name is done go to the next portion
+            if(input[i].compare(":-") == 0) j++;     //If the end of the parameters for the rule name is done go to the next portion
             else    query.parameters.push(input[i]);
         }
         else if(j == 1){
@@ -114,24 +112,24 @@ Query& Parser::parseRule(vector<string> input, Query& query){
             j++;
         }
         else if(j == 2){
-            query.ruleParamNanme[0] = input[i]; //Gets the name of the first rule parameter
+            query.ruleParamName[0] = input[i]; //Gets the name of the first rule parameter
             j++;
         }
         else if(j == 3){
             if(input[i][0] == '$')  temp.push(input[i]);//Adds the parameters of the first fact/rule to a temp queue and adds it when it reaches the end
-            else    query.ruleParams.push(temp); j++;
+            else{    
+                query.ruleParamName[1] = input[i];  //Sets the name of the second parameter and empties out the temp queue
+                query.ruleParams.push(temp); 
+                queue<string> empty;
+                empty.swap(temp);
+                j++;
+            }
         }
         else if(j == 4){
-            query.ruleParamName[1] = input[i];  //Sets the name of the second parameter and empties out the temp queue
-            queue<string> empty;
-            empty.swap(temp);
-            j++;
-        }
-        else if(j == 5){
             if(input[i][0] == '$')  temp.push(input[i]);//Adds the parameters for the second fact/rule to the temp queue and will add it to the query object
-            else    query.ruleParams.push(temp);
         }
     }
+    query.ruleParams.push(temp);
     return query;
 }
 

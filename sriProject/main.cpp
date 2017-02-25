@@ -10,8 +10,9 @@ int main() {
 
     string command;
     while (command != "EXIT"){
-        //string transaction;
-        //cout << "$> ";
+
+        cout << "$> ";
+
         getline(cin , command);
         interface.executeCommand(command);
         

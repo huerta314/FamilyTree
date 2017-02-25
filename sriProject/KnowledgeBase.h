@@ -12,13 +12,13 @@
 class KnowledgeBase{
 
 	//friend class Node;
-	map<string, map<string, vector<string> > > knowledgeContainer;
+	
 	//   father         roger          john, bob, ...
 	//   apple         applesauce      applejuice, applepie, ....
 
 	
 private:
-	
+	map<string, map<string, vector<string> > > knowledgeContainer;
 	
 public:
 
