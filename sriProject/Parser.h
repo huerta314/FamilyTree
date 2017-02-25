@@ -6,25 +6,22 @@
 class Parser{
 
 private:
-    /*Might have to have this defined in the header cause apparently templates can only be defined in header :/
+    /*This is a split function to split up the string inputs from the command line
+    Might have to have this defined in the header cause apparently templates can only be defined in header :/
     template <typename Container>
     Container& split(
         Container&                            result,
         const typename Container::value_type& s,
-        const typename Container::value_type& delimiters,
-        split::empties_t                      empties = split::empties_ok )
+        const typename Container::value_type& delimiters )
     {
         result.clear();
         size_t current;
         size_t next = -1;
         do
     {
-        if (empties == 0)
-        {
-          next = s.find_first_not_of( delimiters, next + 1 );
-          if (next == Container::value_type::npos) break;
-          next -= 1;
-        }
+        next = s.find_first_not_of( delimiters, next + 1 );
+        if (next == Container::value_type::npos) break;
+        next -= 1;
         current = next + 1;
         next = s.find_first_of( delimiters, current );
         result.push_back( s.substr( current, next - current ) );
@@ -34,13 +31,13 @@ private:
 }*/
 
     //parse public method will decide which one of these to call.
-                                        //From page 4 of assignment pdf
-    Query& parseDump(vector<string> input);      //DUMP updated_family_relation.sri 
-    Query& parseFact(vector<string> input);      //FACT Father(Roger,John) 
-    Query& parseInference(vector<string> input); //INFERENCE GrandFather($X,$Y)
-    Query& parseLoad(vector<string> input);      //LOAD file.sri
-    Query& parseRule(vector<string> input);      //RULE Parent($X,$Y):- OR Father($X,$Y) Mother($X,$Y)
-    Query& parseDrop(vector<string> input);      //DROP Parent # delete the Parent rule 
+    //From page 4 of assignment pdf
+    Query& parseDump(vector<string> input, Query& query);      //DUMP updated_family_relation.sri 
+    Query& parseFact(vector<string> input, Query& query);      //FACT Father(Roger,John) 
+    Query& parseInference(vector<string> input, Query& query); //INFERENCE GrandFather($X,$Y)
+    Query& parseLoad(vector<string> input, Query& query);      //LOAD file.sri
+    Query& parseRule(vector<string> input, Query& query);      //RULE Parent($X,$Y):- OR Father($X,$Y) Mother($X,$Y)
+    Query& parseDrop(vector<string> input, Query& query);      //DROP Parent # delete the Parent rule 
     
     
 

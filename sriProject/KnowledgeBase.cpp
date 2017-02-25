@@ -7,7 +7,7 @@ KnowledgeBase::KnowledgeBase(){
 
 int KnowledgeBase::AddFact(Query query){
     
-    map<string, vector<string> >* factMapTemp = &(knowledgeContainer[query.factName]);
+    map<string, vector<string> >* factMapTemp = &(knowledgeContainer[query.name]);
    // map<string, vector<string> >::iterator it = factMapTemp.find(firstName);
     string firstName = query.parameters.front();
     query.parameters.pop();
@@ -25,7 +25,7 @@ int KnowledgeBase::AddFact(Query query){
 
 int KnowledgeBase::RemoveFact(Query query){
     
-    map<string, vector<string> >* factMapTemp = &(knowledgeContainer[query.factName]);
+    map<string, vector<string> >* factMapTemp = &(knowledgeContainer[query.name]);
     if (query.parameters.size() == 0){
         
         factMapTemp->clear();
