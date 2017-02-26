@@ -139,6 +139,7 @@ void KnowledgeBase::getAllQueriesWithXParamInPos(string x, int pos, deque<Query>
             output.push_back( tempQ );
         }else {
             
+            
         //do nothing
         }
     }

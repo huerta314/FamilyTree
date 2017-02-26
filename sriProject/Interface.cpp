@@ -34,8 +34,9 @@ int Interface::Load(Query query){
         while(getline(file,line)){
             executeCommand(line);
         }
+        file.close();
     }
-    file.close();
+     else cout << "Unable to open file"; 
 }
 
 //Prints the results of the inference command

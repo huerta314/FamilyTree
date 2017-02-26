@@ -8,7 +8,7 @@
 #include <deque>
 
 
-#include "Node.h"
+//#include "Node.h"
 #include "Query.h"
 
 class KnowledgeBase{
