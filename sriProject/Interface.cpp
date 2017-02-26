@@ -10,7 +10,16 @@ Interface::Interface(){
 
 int Interface::executeCommand(string command){
     //Parse command
-    Query query = parser.parse(command);
+    Query query; 
+    try{
+        query = parser.parse(command);
+    }
+    catch (int ex){
+        if(ex == 55){
+            cout << "Error: invalid command" << endl;
+        }
+        return 0;
+    }
     //Check the header of the query object and check what command it calls
     //If statements for all the functions to call with whatever else needs to be done
     if( (query.command.compare("FACT") == 0) || (query.command.compare("RULE") == 0) ) ops.Add(query);
@@ -33,7 +42,7 @@ int Interface::Load(Query query){
     ifstream file(query.file);
     if(file.is_open()){
         while(getline(file,line)){
-            if(line == " ") continue;
+            if(line == " ") continue; //Also need to check for \n?
             executeCommand(line);
         }
         file.close();

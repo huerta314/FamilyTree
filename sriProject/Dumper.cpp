@@ -53,8 +53,8 @@ void Dumper::dump(string file, KnowledgeBase& KB, RuleBase& RB){
             buffer += "(";
             //Just like before, print all params for the sub-rule
             for(int i = 0; i < query.ruleParams[0].size(); i++){
-                buffer += query.parameters[0][i];
-                if(i+1 != query.parameters[0].size()){
+                buffer += query.ruleParams[0][i];
+                if(i+1 != query.ruleParams[0].size()){
                     buffer += ",";
                 }
             }
@@ -63,8 +63,8 @@ void Dumper::dump(string file, KnowledgeBase& KB, RuleBase& RB){
             buffer += query.ruleParamName[1];
             buffer += "(";
             for(int i = 0; i < query.ruleParams[1].size(); i++){
-                buffer += query.parameters[1][i];
-                if(i+1 != query.parameters[1].size()){
+                buffer += query.ruleParams[1][i];
+                if(i+1 != query.ruleParams[1].size()){
                     buffer += ",";
                 }
             }

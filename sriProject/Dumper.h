@@ -1,5 +1,5 @@
 /* Dumper.h */
-//Dumper class to dump the knowledge bae and rule base into a file
+//Dumper class to dump the knowledge base and rule base into a file
 #ifndef DUMPER_H_
 #define DUMPER_H_
 

@@ -13,12 +13,12 @@ using namespace std;
 struct Query{
 	
 	int 					flag;			//Flag to check if a drop command has a variable to search
-	string					command;		//Name of the command issued
-	string					ident;			//Rule or fact identifier
+	string					command;		//Name of the command issued, FACT, RULE ,INFERENCE
+	string					ident;			//Rule or fact identifier 
 	//For adding/removing/parsing
-	string					name;			//Name of the rule or fact to add
+	string					name;			//Name of the rule or fact to add like Parent, Father
 	deque<string>			parameters;		//The parameters of a fact or rule
-	string					ruleParamName[2];//The names of the facts that make up the rule and there will only be 2 of them
+	string					ruleParamName[2];//The names of the facts/rules that make up the rule and there will only be 2 of them ex. Mother Parent
 	deque<deque<string> >	ruleParams;		//A queue of a queue to hold the rule parameters
 	string					ruleIdent;		//String to hold whether the rule is an AND or OR
 	//For dumping/loading

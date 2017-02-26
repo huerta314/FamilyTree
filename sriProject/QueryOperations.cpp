@@ -31,14 +31,16 @@ int QueryOperations::Inference(Query query, deque<Query>& output){
     if (doesFactExist == false){ //no facts in kb, try the rule base
         
         bool doesRuleExist = rb.doesRuleExist(query);
-        if (doesRuleExist == false){
-            
+        if (!doesRuleExist)
             return 0; //for no inference found
+        else{
+            rb.doesRuleExist(query,query.name); //Replaces query object with a rule, should replace code
+            rb.QueryRule(query,output, kb);
         }
     }else {
-        deque<Query> tempDeque;
-        kb.QueryFact(query, tempDeque);
-        output = tempDeque;
+        //deque<Query> tempDeque;
+        kb.QueryFact(query, output);
+        //output = tempDeque;
         return 1;
     }
     

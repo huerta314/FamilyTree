@@ -87,12 +87,16 @@ typedef struct variable{
     string variable;
     int position;
 } variable_t;
-
+//                                       inputDeque is really outputDeque
 int KnowledgeBase::QueryFact(Query query, deque<Query>& inputDeque){
+    
+    //check fro empty input deque, and remove duplicate
+
+    
     
     deque<Query>* tempDeque = &knowledgeContainer[query.name];
     deque<Query> retDeque;
-    
+    deque<Query> retDequeVarTemp;
     for(int i = 0; i < tempDeque->size(); i++){
         Query* tempQuery = &(*tempDeque)[i];
         if (tempQuery->parameters.size() == query.parameters.size() ){
@@ -104,7 +108,7 @@ int KnowledgeBase::QueryFact(Query query, deque<Query>& inputDeque){
     if (query.flag == 1){
         
         map<string, string > varTable;
-        deque<Query> retDequeVarTemp;
+        
         bool goodToReturn = true;
         Query tempQ;
         for (int i = 0; i < retDeque.size(); i++){
@@ -117,6 +121,7 @@ int KnowledgeBase::QueryFact(Query query, deque<Query>& inputDeque){
                     it = varTable.find(query.parameters[j]);
                     if (it == varTable.end()){
                         
+                        
                         varTable[query.parameters[j]] = tempQ.parameters[j];                        
                     }else { //parameter was found. match. if match we good. no match, false ret
                         
@@ -128,11 +133,24 @@ int KnowledgeBase::QueryFact(Query query, deque<Query>& inputDeque){
                     } //example, Bob($x, $x) mapped to Bob(John, John). 2 iterations wont hit goood to return = false
                         //but Bob($x, $x) mapped to Bob(John, Jack). first iteration good. second iteration, will hit else and good return = false will hit.
                         //when using all different vars, no way that find can find success. so never good to return will hit
+                    //last step, look for duplicates in second.
                     
                 }else{  //not a parameter to match
                     
                     if ( (tempQ.parameters[j]) != query.parameters[j] ){
                         
+                        goodToReturn = false;
+                    }
+                }
+            }
+            //look for duplicates in second
+            for (auto i = varTable.begin(); i != varTable.end(); i++){
+                
+                auto j = varTable.begin();
+                j++;
+                for (; j != varTable.end(); j++){
+                    
+                    if ( (i->second == j->second ) && (i->first != j->first) ){
                         goodToReturn = false;
                     }
                 }
@@ -144,12 +162,8 @@ int KnowledgeBase::QueryFact(Query query, deque<Query>& inputDeque){
             goodToReturn = true;
             varTable.clear();
         }
-        inputDeque = retDequeVarTemp;
-        return 1;
-
     }else{
         
-        deque<Query> retDequeVarTemp;
         bool goodToReturn = true;
         Query tempQ;
         for (int i = 0; i < retDeque.size(); i++){
@@ -166,9 +180,26 @@ int KnowledgeBase::QueryFact(Query query, deque<Query>& inputDeque){
             }
             goodToReturn = true;
         }
-        inputDeque = retDequeVarTemp;
-        return 1;
+        
     }
+    
+    bool canIAddToInput = true;
+    for (auto i = retDequeVarTemp.begin(); i != retDequeVarTemp.end(); i++){
+        
+        for (auto j = inputDeque.begin(); j != inputDeque.end(); j++){
+            
+            if ( (*i).factEquality(*j) == true ){
+                canIAddToInput = false;
+            }
+        }
+        if (canIAddToInput == true){
+            inputDeque.push_back(*i);
+        }
+        canIAddToInput = true;
+    }
+    
+    //inputDeque = retDequeVarTemp;
+    return 1;
 }
 
 KnowledgeBase::~KnowledgeBase(){}

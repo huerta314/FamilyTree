@@ -6,7 +6,7 @@ ostream& operator<<(ostream &output, const Query &query){
         cout<<query.parameters[i];
         if(i != query.parameters.size()-1) cout<<",";
     }
-    cout<<")"<<endl;
+    cout<<")";
     return output;
 }
 

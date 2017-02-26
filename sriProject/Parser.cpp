@@ -37,7 +37,9 @@ Query Parser::parse(string input){
     vector <string> params;
     //Split input into the a vector each split by whitespace commas and parenthesis
     split(params, input, " ,()");
-    
+    if(params.size() == 0){
+         throw 55; //Arbitrary error number for invalid command
+    }
     //The first parameter of the string should be the command so set that to the query object
     //and give it to the right parse command passing the rest of the parameters.
     //Could probably try catch an error here for unknown command
