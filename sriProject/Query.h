@@ -1,3 +1,6 @@
+/* Query.h */
+//Struct query object that holds all of the fact and rule data
+
 #ifndef QUERY_H_
 #define QUERY_H_
 
@@ -22,7 +25,7 @@ struct Query{
 	string					file;			//Name of the file to output/load
 	
 	Query():flag(0){}						//Default constructor to set the flag to 0
-	friend ostream &operator<<( ostream &output, const Query query );
+	friend ostream& operator<<( ostream &output, const Query &query );//Operator overload to output query objects which is just in the form Father(Bill,John)
 };
 
 

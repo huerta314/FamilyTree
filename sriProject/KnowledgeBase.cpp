@@ -121,11 +121,83 @@ bool KnowledgeBase::doesFactExist(Query query){
         return true;
     }
 }
-int QueryFact(Query query, deque<Query>& inputDeque){
+
+//grab from input the things with x param in pos and put in output
+void KnowledgeBase::getAllQueriesWithXParamInPos(string x, int pos, deque<Query>& input, deque<Query>& output){
+    
+    for (int i = 0; i < input.size(); i++){
+        bool trueCond = false;
+        
+        if (x.size() == 0)
+            trueCond = true;
+        else
+            trueCond = (input[i].parameters[pos] == x);
+        
+        if (trueCond){
+            
+            Query tempQ = input[i];
+            output.push_back( tempQ );
+        }else {
+            
+        //do nothing
+        }
+    }
+}
+
+//deprecated struct
+typedef struct variable{
+    string variable;
+    int position;
+} variable_t;
+
+int KnowledgeBase::QueryFact(Query query, deque<Query>& inputDeque){
     
     
+    deque<Query>* tempDeque = &knowledgeContainer[query.name];
+    deque<Query> retDeque;
     
-    
+    for(int i = 0; i < tempDeque->size(); i++){
+        Query* tempQuery = &(*tempDeque)[i];
+        if (tempQuery->parameters.size() == query.parameters.size() ){
+            
+            retDeque.push_back(*tempQuery); //build a deque of all queries of same size
+        }
+    }
+    //after obtainin all things in same size, count number of variables and their positions. if there are variables
+    if (query.flag == 1){
+        
+        deque<Query> retDequeVarTemp;
+        vector<variable_t> varList;
+        for (int i = 0; i < query.parameters.size(); i++){
+            
+            if (query.parameters[i][0] == '$'){
+                
+                getAllQueriesWithXParamInPos("", i, retDeque, retDequeVarTemp);
+            }else {
+                getAllQueriesWithXParamInPos(query.parameters[i], i, retDeque, retDequeVarTemp);
+            }
+            
+            retDeque = retDequeVarTemp;
+            retDequeVarTemp.clear();
+        }
+
+        //done filtering variable
+        inputDeque = retDeque;
+        return 1;
+    }else{
+        
+        deque<Query> retDequeVarTemp;
+        for (int i = 0; i < query.parameters.size(); i++){
+            
+
+            getAllQueriesWithXParamInPos(query.parameters[i], i, retDeque, retDequeVarTemp);
+            retDeque = retDequeVarTemp;
+            retDequeVarTemp.clear();
+            
+        }
+        inputDeque = retDeque;
+        return 1;
+    }
 }
 
 KnowledgeBase::~KnowledgeBase(){}

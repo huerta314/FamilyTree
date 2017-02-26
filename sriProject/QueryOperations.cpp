@@ -18,38 +18,36 @@ int QueryOperations::Remove(Query query){
     rb.RemoveRule(query);
 }
 
-int QueryOperations::Inference(Query query){
+
+
+int QueryOperations::Inference(Query query, deque<Query>& output){
     
     /*
     1. check each rule that matches the query name
     2. process rules to create temporary facts of given type
     3. if the user enters a name for temporary rules, then save*/
     
-    bool doesFactExist = kb.doesFactExist(query.name);
+    bool doesFactExist = kb.doesFactExist(query);
     if (doesFactExist == false){ //no facts in kb, try the rule base
         
-        bool doesRuleExist = rb.doesRuleExist();
+        bool doesRuleExist = rb.doesRuleExist(query);
         if (doesRuleExist == false){
             
             return 0; //for no inference found
         }
     }else {
-        
-        kb.QueryFact(query);
+        deque<Query> tempDeque;
+        kb.QueryFact(query, tempDeque);
+        output = tempDeque;
+        return 1;
     }
     
 }
 
 int QueryOperations::Dump(Query query){
-    dumper.dump(query.file);
+    dumper.dump(query.file, kb, rb);
     
     return 1;
-}
-
-int QueryOperations::Load(Query query){
-    //Read file
-    //Loop through adding rules and facts
-    //If theres inferences then search for them
 }
 
 QueryOperations::~QueryOperations(){}

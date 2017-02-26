@@ -18,7 +18,7 @@ void Dumper::dump(string file, KnowledgeBase& KB, RuleBase& RB){
     for(auto &outer_pair : KB.knowledgeContainer){ //string, vector<Query> pairs
         for(auto &query : outer_pair.second){
             buffer += "FACT ";
-            buffer += query.name//add query fields
+            buffer += query.name;//add query fields
             buffer += "(";
             //Loop through each parameter and add it to the buffer
             for(int i = 0; i < query.parameters.size(); i++){
@@ -36,7 +36,7 @@ void Dumper::dump(string file, KnowledgeBase& KB, RuleBase& RB){
         //Loop through each query in the vector of queries for the rule
         for(auto &query : outer_pair.second){
             buffer += "RULE ";
-            buffer += query.name//add query fields to the buffer
+            buffer += query.name;//add query fields to the buffer
             buffer += "(";
             //Loop through each parameter and add it to the buffer
             for(int i = 0; i < query.parameters.size(); i++){
@@ -52,7 +52,7 @@ void Dumper::dump(string file, KnowledgeBase& KB, RuleBase& RB){
             buffer += query.ruleParamName[0];
             buffer += "(";
             //Just like before, print all params for the sub-rule
-            for(int i = 0; i < query.rulesParams[0].size(); i++){
+            for(int i = 0; i < query.ruleParams[0].size(); i++){
                 buffer += query.parameters[0][i];
                 if(i+1 != query.parameters[0].size()){
                     buffer += ",";
@@ -62,7 +62,7 @@ void Dumper::dump(string file, KnowledgeBase& KB, RuleBase& RB){
             //Repeat for second sub-rule
             buffer += query.ruleParamName[1];
             buffer += "(";
-            for(int i = 0; i < query.rulesParams[1].size(); i++){
+            for(int i = 0; i < query.ruleParams[1].size(); i++){
                 buffer += query.parameters[1][i];
                 if(i+1 != query.parameters[1].size()){
                     buffer += ",";

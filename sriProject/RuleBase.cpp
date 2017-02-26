@@ -32,8 +32,8 @@ int RuleBase::RemoveRule(Query query){
 bool RuleBase::doesRuleExist(Query query){
     
     map<string, deque<Query> >::iterator it;
-    it = knowledgeContainer.find(query.name);
-    if (it == knowledgeContainer.end() ){
+    it = ruleContainer.find(query.name);
+    if (it == ruleContainer.end() ){
         
         return false;
     }else {
