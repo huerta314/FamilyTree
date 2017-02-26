@@ -26,8 +26,9 @@ struct Query{
 	
 	Query():flag(0){}						//Default constructor to set the flag to 0
 	friend ostream& operator<<( ostream &output, const Query &query );//Operator overload to output query objects which is just in the form Father(Bill,John)
-};
 
+	bool factEquality(const Query& other);
+};
 
 
 #endif

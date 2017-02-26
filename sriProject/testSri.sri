@@ -1,0 +1,6 @@
+FACT Father(Bob, Saget)
+FACT Father(Bob, John)
+FACT Father(Mark, John)
+FACT Apple(AppleSauce, AppleJuice)
+FACT Apple(AppleTree, AppleComputer)
+FACT Father(Mark, Saget)

@@ -11,21 +11,7 @@ int KnowledgeBase::AddFact(Query query){
     knowledgeContainer[query.name].push_back(query);
     
     
-   /*// map<string, vector<string> >::iterator it = factMapTemp.find(firstName);
-    string firstName = query.parameters.front();
-    query.parameters.pop();
-    int sizeOfParams = query.parameters.size();
-    vector<string>* tempSecondParams = &((*factMapTemp)[firstName]);
-    
-    for(int i = 0; i < sizeOfParams; i++){
-        
-        tempSecondParams->push_back(query.parameters.front());
-        query.parameters.pop();
-    }*/
-    
-    //cout << (*factMapTemp)["Bob"][0] << " " << (*factMapTemp)["Bob"][1] << " " << (*factMapTemp)["Bob"][2];
-    //This properly inserts the fact into the knowledge base. Need a way to print the values out the above line seg faults.
-    
+
     return 1; //no error checking for now
 }
 
@@ -36,77 +22,27 @@ int KnowledgeBase::RemoveFact(Query query){
         knowledgeContainer[query.name].clear();
         knowledgeContainer.erase(query.name);
     }else if (query.parameters.size() > 0){
+        deque<Query> queriesToMatchToDelete;
+        QueryFact(query, queriesToMatchToDelete);
         
-        deque<Query>* factList = &knowledgeContainer[query.name];
-        
-        int outerSize = query.parameters.size();
-        int listSize = factList->size();
-        
-        bool goodToDelete = false;
-        vector<string> varList;
-        int varCounter = 0;
-        
-        for(int i = 0; i < listSize; i++){
+        deque<Query>* kbFacts = &knowledgeContainer[query.name];
+        int j = 0;
+        for (auto i = kbFacts->begin(); i != kbFacts->end(); i++){
             
-            Query* currentFact = &(*factList)[i];
-            
-            if ( currentFact->parameters.size()  == query.parameters.size() ){
+            for (int j = 0; j < queriesToMatchToDelete.size(); j++){
                 
-                if(query.flag == 0){
+                Query tempQ = *i;
+                if ( tempQ.factEquality(queriesToMatchToDelete[j]) == true ){
                     
-                    if (currentFact->parameters == query.parameters){
-                        factList->erase(factList->begin() + i); //delete ith query
-                    }
-                    
-                }else {
-                    
-                    /*for (int j = 0; j < outerSize; j++){
-                        
-                        string paramOuter = query.parameters.front();
-                        string paramMy = ((*factList)[i]).front();
-                        if (paramOuter[varCounter] == '$' ){
-                            varList.push_back(paramOuter[varCounter]);
-                            varCounter++;
-                        }
-                    }    */
-                    cout << "\ndeleting with parameters. placeholder function\n"<<endl;
+                    kbFacts->erase(i);
                 }
             }
         }
+        return 1;
     }
-    
-    /*map<string, vector<string> >* factMapTemp = &(knowledgeContainer[query.name]);
-    if (query.parameters.size() == 0){
         
-        factMapTemp->clear();
-    }else if (query.parameters.size() == 1){
-        
-        string firstName = query.parameters.front();
-        query.parameters.pop();        
-        vector<string>* tempSecondParams = &((*factMapTemp)[firstName]);
-        tempSecondParams->clear();
-        
-    }else if (query.parameters.size() > 1) {
-        string firstName = query.parameters.front();
-        query.parameters.pop();        
-        vector<string>* tempSecondParams = &( (*factMapTemp)[firstName]);
-        
-        int sizeOfParams = query.parameters.size();
-        int numOfElements = tempSecondParams->size();
-        
-        for (int i = 0; i < sizeOfParams; i++){//for every element in queue
-            
-            for (int j = 0; j < numOfElements; j++){//iterate through all elements in array
-                if ( (*tempSecondParams)[j] == query.parameters.front() ){
-                    //delete matching one
-                    
-                    vector<string>::iterator nposit = tempSecondParams->begin() + j;
-                    tempSecondParams->erase(nposit);
-                    query.parameters.pop();
-                }
-            }
-        }
-    }*/
+    return 1;
+
     
 }
 bool KnowledgeBase::doesFactExist(Query query){
@@ -122,6 +58,7 @@ bool KnowledgeBase::doesFactExist(Query query){
     }
 }
 
+//-----****Deprecated****-----
 //grab from input the things with x param in pos and put in output
 void KnowledgeBase::getAllQueriesWithXParamInPos(string x, int pos, deque<Query>& input, deque<Query>& output){
     
@@ -153,7 +90,6 @@ typedef struct variable{
 
 int KnowledgeBase::QueryFact(Query query, deque<Query>& inputDeque){
     
-    
     deque<Query>* tempDeque = &knowledgeContainer[query.name];
     deque<Query> retDeque;
     
@@ -167,38 +103,79 @@ int KnowledgeBase::QueryFact(Query query, deque<Query>& inputDeque){
     //after obtainin all things in same size, count number of variables and their positions. if there are variables
     if (query.flag == 1){
         
+        map<string, string > varTable;
         deque<Query> retDequeVarTemp;
-        vector<variable_t> varList;
-        for (int i = 0; i < query.parameters.size(); i++){
+        bool goodToReturn = true;
+        Query tempQ;
+        for (int i = 0; i < retDeque.size(); i++){
             
-            if (query.parameters[i][0] == '$'){
-                
-                getAllQueriesWithXParamInPos("", i, retDeque, retDequeVarTemp);
-            }else {
-                getAllQueriesWithXParamInPos(query.parameters[i], i, retDeque, retDequeVarTemp);
+            for (int j = 0; j < query.parameters.size(); j++){
+                tempQ = retDeque[i];
+                if ( query.parameters[j][0] == '$' ){
+                    
+                    std::map<string,string>::iterator it;
+                    it = varTable.find(query.parameters[j]);
+                    if (it == varTable.end()){
+                        
+                        varTable[query.parameters[j]] = tempQ.parameters[j];                        
+                    }else { //parameter was found. match. if match we good. no match, false ret
+                        
+                        string parameterValue = varTable[query.parameters[j]];
+                        if (parameterValue != tempQ.parameters[j] ){
+                            
+                            goodToReturn = false;
+                        }
+                    } //example, Bob($x, $x) mapped to Bob(John, John). 2 iterations wont hit goood to return = false
+                        //but Bob($x, $x) mapped to Bob(John, Jack). first iteration good. second iteration, will hit else and good return = false will hit.
+                        //when using all different vars, no way that find can find success. so never good to return will hit
+                    
+                }else{  //not a parameter to match
+                    
+                    if ( (tempQ.parameters[j]) != query.parameters[j] ){
+                        
+                        goodToReturn = false;
+                    }
+                }
             }
-            
-            retDeque = retDequeVarTemp;
-            retDequeVarTemp.clear();
+            if (goodToReturn){
+                
+                retDequeVarTemp.push_back(tempQ);
+            }
+            goodToReturn = true;
+            varTable.clear();
         }
-
-        //done filtering variable
-        inputDeque = retDeque;
+        inputDeque = retDequeVarTemp;
         return 1;
+
     }else{
         
         deque<Query> retDequeVarTemp;
-        for (int i = 0; i < query.parameters.size(); i++){
+        bool goodToReturn = true;
+        Query tempQ;
+        for (int i = 0; i < retDeque.size(); i++){
             
-
-            getAllQueriesWithXParamInPos(query.parameters[i], i, retDeque, retDequeVarTemp);
-            retDeque = retDequeVarTemp;
-            retDequeVarTemp.clear();
-            
+            for (int j = 0; j < query.parameters.size(); j++){
+                tempQ = retDeque[i];
+                if ( (tempQ.parameters[j]) != query.parameters[j] ){
+                    goodToReturn = false;
+                }
+            }
+            if (goodToReturn){
+                
+                retDequeVarTemp.push_back(tempQ);
+            }
+            goodToReturn = true;
         }
-        inputDeque = retDeque;
+        inputDeque = retDequeVarTemp;
         return 1;
     }
 }
 
 KnowledgeBase::~KnowledgeBase(){}
+
+/*Code trashcan, dont delete untill confirm working
+Query trash code: http://pastebin.com/wDq6593z
+remove fact trash: http://pastebin.com/FGYMFvGu
+add fact trash: http://pastebin.com/pWYycsDe
+remove fact deprecated 2: http://pastebin.com/0pgWG4QT
+*/

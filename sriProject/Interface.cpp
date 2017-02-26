@@ -24,6 +24,7 @@ int Interface::executeCommand(string command){
         }
         print(tempDeque);
     } 
+    return 1;
 }
 
 //Loads a file and each line should just be a command so take each line and give it back to the execute command function
@@ -32,11 +33,12 @@ int Interface::Load(Query query){
     ifstream file(query.file);
     if(file.is_open()){
         while(getline(file,line)){
+            if(line == " ") continue;
             executeCommand(line);
         }
         file.close();
     }
-     else cout << "Unable to open file"; 
+    else cout << "Unable to open file"; 
 }
 
 //Prints the results of the inference command
