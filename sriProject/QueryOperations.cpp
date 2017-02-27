@@ -26,24 +26,20 @@ int QueryOperations::Inference(Query query, deque<Query>& output){
     1. check each rule that matches the query name
     2. process rules to create temporary facts of given type
     3. if the user enters a name for temporary rules, then save*/
-    
+    Query tempq;
     bool doesFactExist = kb.doesFactExist(query); //returns if fact is 
-    if (doesFactExist == false){ //no facts in kb, try the rule base
-        
-        bool doesRuleExist = rb.doesRuleExist(query);
-        if (!doesRuleExist)
-            return 0; //for no inference found
-        else{
-            rb.doesRuleExist(query,query.name); //Replaces query object with a rule, should replace code
-            rb.QueryRule(query,output, kb);
-        }
-    }else {
-        //deque<Query> tempDeque;
+    if (doesFactExist){
         kb.QueryFact(query, output);
-        //output = tempDeque;
-        return 1;
     }
-    
+    bool doesRuleExist = rb.doesRuleExist(query);
+    if (doesRuleExist){
+        rb.setRuleIdent(query,query.name); //Replaces query object with a rule, should replace code
+        rb.QueryRule(query,output, kb);
+    }
+    if(!doesRuleExist && !doesFactExist)
+        return 0;                           //No inference found
+    else
+        return 1;
 }
 
 int QueryOperations::Dump(Query query){

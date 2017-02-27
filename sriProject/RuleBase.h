@@ -14,6 +14,12 @@ using std::map;
 using std::string;
 using std::vector;
 
+typedef struct varPair{
+    int origParam;
+    int newParam;
+    varPair(): newParam(-1){}
+}varPairT;
+
 class RuleBase{
 	friend class Dumper;
 
@@ -26,8 +32,11 @@ public:
 	int 	QueryRule(Query query,deque<Query>& output,KnowledgeBase kb);//Deduce aliases to facts and logical operations
 	
 	bool	doesRuleExist(Query query);								//Check if the rule exists
-	bool	doesRuleExist(Query& query, string name);				//Check if the rule exists and passes the existing rule to the query
+	bool	setORRule(Query& query, string name);					//Check if the rule exists and passes the existing rule to the query
+	bool    setRuleIdent(Query& query, string name);				//Sets the OR/AND identity for a query objec
+	bool    setSecondIdent(Query& query, string name);
 	Query	createFactQuery(string name, deque<string> parameters);	//Creates a fact inference to search the knowledge base with
+	map<string,varPairT> setParamIndex(Query query);
 	RuleBase();
 	~RuleBase();
 };
