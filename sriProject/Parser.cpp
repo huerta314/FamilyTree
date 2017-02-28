@@ -56,8 +56,11 @@ Query Parser::parse(string input){
         parseLoad(params, query);
     else if(query.command.compare("INFERENCE") == 0)
         parseInference(params, query);
+    else if(query.command.compare("EXIT") == 0){
+        return query;
+    }
     else
-        cout<<"Throw error here or something"<<endl;
+        cout<<"Error improper input"<<endl;
     return query;
 }
 

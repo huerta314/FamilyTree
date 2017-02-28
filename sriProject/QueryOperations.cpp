@@ -33,7 +33,7 @@ int QueryOperations::Inference(Query query, deque<Query>& output){
     }
     bool doesRuleExist = rb.doesRuleExist(query);
     if (doesRuleExist){
-        rb.setRuleIdent(query,query.name); //Replaces query object with a rule, should replace code
+        rb.setRuleIdent(query,query.name); //Replaces query object with a rule
         rb.QueryRule(query,output, kb);
     }
     if(!doesRuleExist && !doesFactExist)
