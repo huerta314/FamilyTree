@@ -23,6 +23,12 @@ int RuleBase::AddRule(Query query){
 Removes a rule from the rulebase if found.
 */
 int RuleBase::RemoveRule(Query query){
+    map<string, deque<Query> >::iterator it;
+    it = ruleContainer.find(query.name);
+    if (it != ruleContainer.end() )
+        ruleContainer[query.name].clear;
+        
+    /*
     if(query.parameters.size() == 0){
         ruleContainer[query.name].clear();
         ruleContainer.erase(query.name);
@@ -33,7 +39,7 @@ int RuleBase::RemoveRule(Query query){
                 ruleContainer[query.name].erase(ruleContainer[query.name].begin()+(i-1));
         }
     }
-    
+    */
 }
 
 /*
@@ -154,6 +160,7 @@ map<string, varPairT> RuleBase::setParamIndex(Query query){
 int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
     
     Query paramQuery;           //Temporary query used by OR to search for more rules
+    deque<Query> tOut;
     deque<Query> tempOutput;    //Temporary output of the second half of the AND operator
     deque<Query> result;        //Temporary output of AND operator
     int count = 0;
@@ -165,14 +172,17 @@ int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
     */
     if(query.ruleIdent.compare("OR") == 0){
         if(setORRule(paramQuery, query.ruleParamName[0]))
-            QueryRule(paramQuery,output, kb);
+            QueryRule(paramQuery,tOut, kb);
         else
-            kb.QueryFact(createFactQuery(query.ruleParamName[0], query.parameters),output);
+            kb.QueryFact(createFactQuery(query.ruleParamName[0], query.parameters),tOut);
         if(setORRule(paramQuery, query.ruleParamName[1]))
-            QueryRule(paramQuery,output, kb);
+            QueryRule(paramQuery,tOut, kb);
         else
-            kb.QueryFact(createFactQuery(query.ruleParamName[1], query.parameters),output);
-
+            kb.QueryFact(createFactQuery(query.ruleParamName[1], query.parameters),tOut);
+        
+        for(int i = 0; i < tOut.size(); i++){
+            output.push_back(tOut[i]);
+        }
     }
     /*AND operator for a rule
     The left half of the AND rule is the start of breaking down the rule. Just call it similar to the OR operator and return its output
@@ -183,12 +193,12 @@ int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
     else if(query.ruleIdent.compare("AND")==0){
         //First half of the AND operator is the same as the OR operator just call it searching for either a rule or fact
         if(setRuleIdent(paramQuery, query.ruleParamName[0]))
-            QueryRule(paramQuery,output, kb);
+            QueryRule(paramQuery,tOut, kb);
         else
             //Queries the rule base with the same first parameter of the inference
             tempOR.push_back(query.parameters[0]);
             tempOR.push_back(query.ruleParams[0][1]);
-            kb.QueryFact(createFactQuery(query.ruleParamName[0], tempOR),output);
+            kb.QueryFact(createFactQuery(query.ruleParamName[0], tempOR),tOut);
         
         map<string,varPairT> varmap = setParamIndex(query);
         
@@ -196,7 +206,7 @@ int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
         int n = 0;
         //Constructs a second query object with the name of the second half of the rule and the matching parameter between
         //both subrules and replaces it with the result of the left half of the expression. Then queries it into the rule/fact base
-        for(int i = 0; i < output.size(); i++){
+        for(int i = 0; i < tOut.size(); i++){
             
             Query constructedSecondParam;
             constructedSecondParam.name = query.ruleParamName[1];
@@ -206,7 +216,7 @@ int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
             for(int j = 0; j < query.ruleParams[1].size(); j++){
                 auto it = varmap.find(query.ruleParams[1][j]);
                 if(it != varmap.end()){
-                    constructedSecondParam.parameters[j] = output[i].parameters[varmap[query.ruleParams[1][j]].origParam];
+                    constructedSecondParam.parameters[j] = tOut[i].parameters[varmap[query.ruleParams[1][j]].origParam];
                 }
             }
             constructedSecondParam.parameters[1] = query.parameters[1];
@@ -239,39 +249,23 @@ int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
             if(query.parameters[0].compare(query.ruleParams[0][i]) == 0) a = i;
             if(query.parameters[1].compare(query.ruleParams[1][i]) == 0) r = i;
         }
-        for(int i = 0; i < output.size(); i++){
+        for(int i = 0; i < tOut.size(); i++){
             auto it = tracker.find(i);
             if(it != tracker.end()){
                 count = it->second.size();
                 for(int j = 0; j < count; j++){
                     Query q;
                     q.name = query.name;
-                    q.parameters.push_back(output[i].parameters[a]);
+                    q.parameters.push_back(tOut[i].parameters[a]);
                     q.parameters.push_back(tempOutput[it->second[0]].parameters[r]);
                     it->second.erase(it->second.begin());
                     result.push_back(q);
                 }
             }
         }
-        /*INEFFICIENT!!!!!!!!!!!!
-        for(auto it=tempOutput.begin(); it != tempOutput.end(); it++){
-            for(auto ij = output.begin(); ij != output.end(); ij++){
-                for(int i = 0; i < it->parameters.size(); i++){
-                    for(int j = 0; j < ij->parameters.size(); j++){
-                        if(it->parameters[i].compare(ij->parameters[j]) == 0){
-                            Query q;
-                            q.name = query.name;
-                            q.parameters.push_back(ij->parameters[0]);
-                            q.parameters.push_back(it->parameters[1]);
-                            result.push_back(q);
-                            break;
-                        }
-                    }
-                }
-            }
-        }*/
-        output = result;
-        
+        for(int i = 0; i < result.size(); i++){
+            output.push_back(result[i]);
+        }
     }
     
 }

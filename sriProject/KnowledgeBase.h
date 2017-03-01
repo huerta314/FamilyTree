@@ -13,9 +13,8 @@
 
 class KnowledgeBase{
 	friend class Dumper;
-	//friend class Node;
+
 private:
-//	map<string, map<string, vector<string> > > knowledgeContainer;
 
 	map<string, deque<Query> > knowledgeContainer;			//Knowledge base datastructure that maps the Fact names as keys and inserts the query objects into a deque for each key
 	
@@ -25,12 +24,9 @@ public:
 	int RemoveFact(Query query);							//Removes a fact either by name or a specific fact
 	int QueryFact(Query query, deque<Query>& inputDeque);	//Searches for a fact by name and parameters
 	bool doesFactExist(Query query);						//Checks if a fact exists in the database
-	void getAllQueriesWithXParamInPos(string x, int pos, deque<Query>& input, deque<Query>& output);
+
 	KnowledgeBase();
-
 	~KnowledgeBase();
-	
-
 };
 
 

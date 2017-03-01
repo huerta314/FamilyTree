@@ -78,6 +78,7 @@ Query& Parser::parseFact(vector<string> input, Query& query){
     query.ident = "FACT";
     query.name = input[1];
     for(int i = 2; i < input.size(); i++){
+        if(input[i][0] == '#') break;
         query.parameters.push_back(input[i]);
     }
     return query;
@@ -89,6 +90,7 @@ Query& Parser::parseFact(vector<string> input, Query& query){
 Query& Parser::parseInference(vector<string> input, Query& query){
     query.name = input[1];
     for(int i = 2; i < input.size(); i++){
+        if(input[i][0] == '#') break;
         if(input[i][0] == '$') query.flag = 1;
         query.parameters.push_back(input[i]);
     }
@@ -108,25 +110,26 @@ Query& Parser::parseLoad(vector<string> input, Query& query){
 Query& Parser::parseRule(vector<string> input, Query& query){
     query.ident = "RULE";
     query.name  = input[1];
-    deque<string> temp;                         //Temoporary string queue to hold the parameters for the rule definition
-    int j       = 0;                            //A counter to keep track of what part of the input we are on
+    deque<string> temp;                                 //Temoporary string queue to hold the parameters for the rule definition
+    int j       = 0;                                    //A counter to keep track of what part of the input we are on
     for(int i = 2; i < input.size(); i++){
+        if(input[i][0] == '#') break;
         if(j == 0){
-            if(input[i].compare(":-") == 0) j++;     //If the end of the parameters for the rule name is done go to the next portion
+            if(input[i].compare(":-") == 0) j++;        //If the end of the parameters for the rule name is done go to the next portion
             else    query.parameters.push_back(input[i]);
         }
         else if(j == 1){
-            query.ruleIdent = input[i];         //The next part is the AND or OR operator
+            query.ruleIdent = input[i];                 //The next part is the AND or OR operator
             j++;
         }
         else if(j == 2){
-            query.ruleParamName[0] = input[i]; //Gets the name of the first rule parameter
+            query.ruleParamName[0] = input[i];          //Gets the name of the first rule parameter
             j++;
         }
         else if(j == 3){
             if(input[i][0] == '$')  temp.push_back(input[i]);//Adds the parameters of the first fact/rule to a temp queue and adds it when it reaches the end
             else{    
-                query.ruleParamName[1] = input[i];  //Sets the name of the second parameter and empties out the temp queue
+                query.ruleParamName[1] = input[i];      //Sets the name of the second parameter and empties out the temp queue
                 query.ruleParams.push_back(temp); 
                 deque<string> empty;
                 empty.swap(temp);
@@ -146,6 +149,7 @@ Query& Parser::parseRule(vector<string> input, Query& query){
 Query& Parser::parseDrop(vector<string> input, Query& query){
     query.name = input[1];
     for(int i = 2; i < input.size(); i++){
+        if(input[i][0] == '#') break;
         if(input[i][0] == '$') query.flag = 1;
         query.parameters.push_back(input[i]);
     }

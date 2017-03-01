@@ -10,8 +10,6 @@ int KnowledgeBase::AddFact(Query query){
     
     knowledgeContainer[query.name].push_back(query);
     
-    
-
     return 1; //no error checking for now
 }
 
@@ -58,41 +56,10 @@ bool KnowledgeBase::doesFactExist(Query query){
     }
 }
 
-//-----****Deprecated****-----
-//grab from input the things with x param in pos and put in output
-void KnowledgeBase::getAllQueriesWithXParamInPos(string x, int pos, deque<Query>& input, deque<Query>& output){
-    
-    for (int i = 0; i < input.size(); i++){
-        bool trueCond = false;
-        
-        if (x.size() == 0)
-            trueCond = true;
-        else
-            trueCond = (input[i].parameters[pos] == x);
-        
-        if (trueCond){
-            
-            Query tempQ = input[i];
-            output.push_back( tempQ );
-        }else {
-            
-            
-        //do nothing
-        }
-    }
-}
 
-//deprecated struct
-typedef struct variable{
-    string variable;
-    int position;
-} variable_t;
-//                                       inputDeque is really outputDeque
 int KnowledgeBase::QueryFact(Query query, deque<Query>& inputDeque){
     
-    //check fro empty input deque, and remove duplicate
-
-    
+    //check for empty input deque, and remove duplicate
     
     deque<Query>* tempDeque = &knowledgeContainer[query.name];
     deque<Query> retDeque;
@@ -198,7 +165,6 @@ int KnowledgeBase::QueryFact(Query query, deque<Query>& inputDeque){
         canIAddToInput = true;
     }
     
-    //inputDeque = retDequeVarTemp;
     return 1;
 }
 
@@ -209,4 +175,5 @@ Query trash code: http://pastebin.com/wDq6593z
 remove fact trash: http://pastebin.com/FGYMFvGu
 add fact trash: http://pastebin.com/pWYycsDe
 remove fact deprecated 2: http://pastebin.com/0pgWG4QT
+getxpos: http://pastebin.com/9KRZ4XH3
 */
