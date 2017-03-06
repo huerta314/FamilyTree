@@ -12,7 +12,7 @@ using namespace std;
 
 struct Query{
 	
-	int 					flag;			//Flag to check if a drop command has a variable to search
+	int 					flag;			//Signals the presence of variables in parameter list
 	string					command;		//Name of the command issued, FACT, RULE ,INFERENCE
 	string					ident;			//Rule or fact identifier 
 	//For adding/removing/parsing

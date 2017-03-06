@@ -22,7 +22,7 @@ public:
 	int Remove(Query query); //Remove fact and rule
 
 	int Inference(Query query, deque<Query>& output); //inference the query
-	int Dump(Query query); //write to file
+	int Dump(Query qulery); //write to file
 	~QueryOperations();
 };
 #endif

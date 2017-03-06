@@ -9,6 +9,7 @@ int main() {
     Interface interface;
 
     string command;
+    cout << "Type 'EXIT' to quit.";
     while (command != "EXIT"){
 
         cout << "$> ";

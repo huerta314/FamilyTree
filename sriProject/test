@@ -1,0 +1,5 @@
+FACT Father(Bob,John)
+FACT Father(Jill,Jane)
+FACT Mother(Marry, Lamb)
+RULE Parent($X,$Y):- OR Father($X,$Y) Mother($X,$Y)
+INFERENCE Parent($X,$Y)

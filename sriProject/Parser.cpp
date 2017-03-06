@@ -37,6 +37,7 @@ Query Parser::parse(string input){
     vector <string> params;
     //Split input into the a vector each split by whitespace commas and parenthesis
     split(params, input, " ,()");
+    
     if(params.size() == 0){
          throw 55; //Arbitrary error number for invalid command
     }
@@ -98,7 +99,10 @@ Query& Parser::parseInference(vector<string> input, Query& query){
 }
 
 Query& Parser::parseLoad(vector<string> input, Query& query){
-    query.file = input[1];
+    if(input.size() > 1)
+        query.file = input[1];
+    else
+        throw 55;
     return query;
 }
 

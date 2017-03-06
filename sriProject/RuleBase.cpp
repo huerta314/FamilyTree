@@ -26,7 +26,8 @@ int RuleBase::RemoveRule(Query query){
     map<string, deque<Query> >::iterator it;
     it = ruleContainer.find(query.name);
     if (it != ruleContainer.end() )
-        ruleContainer[query.name].clear;
+        ruleContainer[query.name].clear();
+        ruleContainer.erase(it);
         
     /*
     if(query.parameters.size() == 0){
@@ -160,94 +161,117 @@ map<string, varPairT> RuleBase::setParamIndex(Query query){
 int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
     
     Query paramQuery;           //Temporary query used by OR to search for more rules
-    deque<Query> tOut;
+    deque<Query> threadOut;
+    deque<Query> tOut; 
     deque<Query> tempOutput;    //Temporary output of the second half of the AND operator
     deque<Query> result;        //Temporary output of AND operator
     int count = 0;
     deque<string> tempOR;
     /*OR operator for a rule
+    Create 2 threads which wil run in parallel. Then wait for both to finish before adding to the output deque.
     Either half of the rule needs to return true for the result to be outputted. Check first if the 
     name of the parameter is a rule and if it is recursively call the function again to break that one down.
     If it's a fact then search the knowledge base to output all of the facts that match the query
     */
     if(query.ruleIdent.compare("OR") == 0){
-        if(setORRule(paramQuery, query.ruleParamName[0]))
-            QueryRule(paramQuery,tOut, kb);
-        else
-            kb.QueryFact(createFactQuery(query.ruleParamName[0], query.parameters),tOut);
-        if(setORRule(paramQuery, query.ruleParamName[1]))
-            QueryRule(paramQuery,tOut, kb);
-        else
-            kb.QueryFact(createFactQuery(query.ruleParamName[1], query.parameters),tOut);
         
+        struct orArgs rThread;
+        rThread.leftOrRight = 0;
+        rThread.paramQuery = &paramQuery;
+        rThread.originalQuery = &query;
+        rThread.tOut = &tOut;
+        rThread.kbPtr = &kb;
+        rThread.rbPtr = this;
+        
+        struct orArgs lThread;
+        lThread.leftOrRight = 1;
+        lThread.paramQuery = &paramQuery;
+        lThread.originalQuery = &query;
+        lThread.tOut = &tOut;
+        lThread.kbPtr = &kb;
+        lThread.rbPtr = this;
+        
+        ORThread a(NULL, &rThread);
+        ORThread * thread = &a;
+        ORThread b(NULL, &lThread);
+        ORThread * thread2 = &b;
+        
+        thread->start();
+        thread2->start();
+
+        thread->waitForRunToFinish();
+        thread2->waitForRunToFinish();
         for(int i = 0; i < tOut.size(); i++){
             output.push_back(tOut[i]);
         }
     }
     /*AND operator for a rule
+    Create 1 thread to search the first half of the AND rule. As the result deque gets filled start running threads for each result to
+    query the second half of the rule.
     The left half of the AND rule is the start of breaking down the rule. Just call it similar to the OR operator and return its output
     Loop through the output of the first half of the rule and replace the matching variable between both parameters with the output and check
     if it's a rule or a fact.If it's a rule recursively call it with the parameters set to the narrowed result. If it's a fact search the knowledgebase
     with the narrowed results. Compare both output and tempOutput and concatenate the results into the name of the rule and the differing variables.
     */
     else if(query.ruleIdent.compare("AND")==0){
-        //First half of the AND operator is the same as the OR operator just call it searching for either a rule or fact
-        if(setRuleIdent(paramQuery, query.ruleParamName[0]))
-            QueryRule(paramQuery,tOut, kb);
-        else
-            //Queries the rule base with the same first parameter of the inference
-            tempOR.push_back(query.parameters[0]);
-            tempOR.push_back(query.ruleParams[0][1]);
-            kb.QueryFact(createFactQuery(query.ruleParamName[0], tempOR),tOut);
-        
+        vector<Thread*> threadmanager;
         map<string,varPairT> varmap = setParamIndex(query);
-        
         map<int,vector<int> > tracker;
         int n = 0;
-        //Constructs a second query object with the name of the second half of the rule and the matching parameter between
-        //both subrules and replaces it with the result of the left half of the expression. Then queries it into the rule/fact base
-        for(int i = 0; i < tOut.size(); i++){
-            
-            Query constructedSecondParam;
-            constructedSecondParam.name = query.ruleParamName[1];
-            constructedSecondParam.parameters = query.ruleParams[1];
-            constructedSecondParam.flag = 1;
-            
-            for(int j = 0; j < query.ruleParams[1].size(); j++){
-                auto it = varmap.find(query.ruleParams[1][j]);
-                if(it != varmap.end()){
-                    constructedSecondParam.parameters[j] = tOut[i].parameters[varmap[query.ruleParams[1][j]].origParam];
-                }
+        int i = 0;
+        
+        struct orArgs lThread;
+        lThread.leftOrRight     = 0;
+        lThread.paramQuery      = &paramQuery;
+        lThread.originalQuery   = &query;
+        lThread.tOut            = &threadOut;
+        lThread.kbPtr           = &kb;
+        lThread.rbPtr           = this;
+        
+        ANDThreadL b(NULL,&lThread);
+        ANDThreadL * thread1 = &b;
+        
+        thread1->start();
+        threadmanager.push_back(thread1);
+        while(thread1->isRunning() || ( threadOut.size() != 0)){
+            if(threadOut.size() > 0){
+                tOut.push_back(threadOut.front());
+                struct andArgsr rThread;
+                rThread.leftOrRight         = 0;
+                rThread.paramQuery          = &paramQuery;
+                rThread.originalQuery       = &query;
+                rThread.inputQ              = &tOut.back();
+                rThread.kbPtr               = &kb;
+                rThread.rbPtr               = this;
+                rThread.varmap              = &varmap;
+                rThread.tempOutput          = &tempOutput;
+                rThread.tracker             = &tracker;
+                rThread.iTracker            = &i;
+                rThread.nTracker            = &n;
+
+                ANDThreadR * thread2 = new ANDThreadR(NULL, &rThread);
+                thread2->start();
+                threadmanager.push_back(thread2);
+
+                threadOut.pop_front();
             }
-            constructedSecondParam.parameters[1] = query.parameters[1];
-            count = tempOutput.size();
-            if(setSecondIdent(constructedSecondParam, constructedSecondParam.name)){
-                QueryRule(constructedSecondParam, tempOutput, kb);
-            }
-            else
-                kb.QueryFact(constructedSecondParam,tempOutput);
-                
-            //Keeps track of the index of the narrowed down search results
-            vector<int> tempvec;
-            if(count < tempOutput.size()){
-                while(n < tempOutput.size()){
-                    tempvec.push_back(n++);
-                }
-                tracker[i] = tempvec;
-            }
-            tempvec.clear();
         }
+        for(int i = 0; i < threadmanager.size(); i++){
+            threadmanager[i]->waitForRunToFinish();
+        }
+
+
         //More efficient searching for the complete result
         //Keep track of the results in output that match in tempOutput using the tracker map
         //the tracker map stores the output index with the matching fact as the key and
         //a vector of matching indices in tempOutput that match with the key index in output
         //Can switch one variable now with 2 parameters.
-        int a = 0;
-        int r = 0;
-        query = ruleContainer[query.name][0];
-        for(int i = 0; i < query.parameters.size(); i++){
-            if(query.parameters[0].compare(query.ruleParams[0][i]) == 0) a = i;
-            if(query.parameters[1].compare(query.ruleParams[1][i]) == 0) r = i;
+        for(int i = 0; i < tOut.size(); i++){
+            for(int j = 0; j < tempOutput.size(); j++){
+                if(tOut[i].parameters[1].compare(tempOutput[j].parameters[0]) == 0){
+                    tracker[i].push_back(j);
+                }
+            }
         }
         for(int i = 0; i < tOut.size(); i++){
             auto it = tracker.find(i);
@@ -256,8 +280,8 @@ int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
                 for(int j = 0; j < count; j++){
                     Query q;
                     q.name = query.name;
-                    q.parameters.push_back(tOut[i].parameters[a]);
-                    q.parameters.push_back(tempOutput[it->second[0]].parameters[r]);
+                    q.parameters.push_back(tOut[i].parameters[0]);
+                    q.parameters.push_back(tempOutput[it->second[0]].parameters[1]);
                     it->second.erase(it->second.begin());
                     result.push_back(q);
                 }

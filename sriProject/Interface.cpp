@@ -42,7 +42,7 @@ int Interface::Load(Query query){
     ifstream file(query.file);
     if(file.is_open()){
         while(getline(file,line)){
-            if(line == " ") continue; //Also need to check for \n?
+            if(line == " ") continue; //Maybe unneeded
             executeCommand(line);
         }
         file.close();

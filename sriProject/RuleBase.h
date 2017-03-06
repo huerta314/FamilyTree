@@ -9,6 +9,9 @@
 
 #include "Query.h"
 #include "KnowledgeBase.h"
+#include "ORThread.h"
+#include "ANDThreadR.h"
+#include "ANDThreadL.h"
 
 using std::map;
 using std::string;
@@ -38,6 +41,10 @@ public:
 	bool    setSecondIdent(Query& query, string name);				//Does a half copy of a rule into a query object
 	Query	createFactQuery(string name, deque<string> parameters);	//Creates a fact inference to search the knowledge base with
 	map<string,varPairT> setParamIndex(Query query);				//Finds the index of matching variables in a rule
+	
+	///void * orFunctionParallelized(void* orArgs); //parallel code
+	
+	
 	RuleBase();
 	~RuleBase();
 };

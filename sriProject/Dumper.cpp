@@ -71,9 +71,9 @@ void Dumper::dump(string file, KnowledgeBase& KB, RuleBase& RB){
             buffer += ")\n"; //end the line
         }
     }
-    
+    buffer.pop_back();
     ofstream output_file; //open file
     output_file.open(file, ios::trunc); //overwrite it if it exists
-    output_file << buffer << endl; //write the buffer to the sri file
+    output_file << buffer; //write the buffer to the sri file
     output_file.close(); //close file
 }

@@ -27,7 +27,7 @@ int QueryOperations::Inference(Query query, deque<Query>& output){
     2. process rules to create temporary facts of given type
     3. if the user enters a name for temporary rules, then save*/
     Query tempq;
-    bool doesFactExist = kb.doesFactExist(query); //returns if fact is 
+    bool doesFactExist = kb.doesFactExist(query); //returns if fact exists 
     if (doesFactExist){
         kb.QueryFact(query, output);
     }
