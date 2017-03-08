@@ -140,11 +140,11 @@ Query RuleBase::createFactQuery(string name, deque<string> parameters){
     return query;
 }
 
-/*
+/*Not needed anymore
 Creates a map of the string variables in the left rule as the key and
 the right rule is matched to a key, if a key is found it wil insert the index
 the matching variable was found in and storing it in a map.
-*/
+
 map<string, varPairT> RuleBase::setParamIndex(Query query){
     map<string,varPairT > varmap;
     for(int i = 0; i < query.ruleParams[0].size(); i++){
@@ -156,7 +156,7 @@ map<string, varPairT> RuleBase::setParamIndex(Query query){
             varmap[query.ruleParams[1][i]].newParam = i;
     }
     return varmap;
-}
+}*/
 
 int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
     
@@ -174,19 +174,19 @@ int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
     If it's a fact then search the knowledge base to output all of the facts that match the query
     */
     if(query.ruleIdent.compare("OR") == 0){
-        
+        //Create the struct to hold all the parameters to run the thread
         struct orArgs rThread;
         rThread.leftOrRight = 0;
-        rThread.paramQuery = &paramQuery;
-        rThread.originalQuery = &query;
+        rThread.paramQuery = paramQuery;
+        rThread.originalQuery = query;
         rThread.tOut = &tOut;
         rThread.kbPtr = &kb;
         rThread.rbPtr = this;
         
         struct orArgs lThread;
         lThread.leftOrRight = 1;
-        lThread.paramQuery = &paramQuery;
-        lThread.originalQuery = &query;
+        lThread.paramQuery = paramQuery;
+        lThread.originalQuery = query;
         lThread.tOut = &tOut;
         lThread.kbPtr = &kb;
         lThread.rbPtr = this;
@@ -215,15 +215,15 @@ int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
     */
     else if(query.ruleIdent.compare("AND")==0){
         vector<Thread*> threadmanager;
-        map<string,varPairT> varmap = setParamIndex(query);
+        //map<string,varPairT> varmap = setParamIndex(query);
         map<int,vector<int> > tracker;
         int n = 0;
         int i = 0;
-        
+        //Create the struct to hold all the parameters to run the thread
         struct orArgs lThread;
         lThread.leftOrRight     = 0;
-        lThread.paramQuery      = &paramQuery;
-        lThread.originalQuery   = &query;
+        lThread.paramQuery      = paramQuery;
+        lThread.originalQuery   = query;
         lThread.tOut            = &threadOut;
         lThread.kbPtr           = &kb;
         lThread.rbPtr           = this;
@@ -233,60 +233,36 @@ int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
         
         thread1->start();
         threadmanager.push_back(thread1);
+        
+        pthread_mutex_t datamutex;
+        pthread_mutex_init(&datamutex,NULL);
         while(thread1->isRunning() || ( threadOut.size() != 0)){
             if(threadOut.size() > 0){
                 tOut.push_back(threadOut.front());
+                threadOut.pop_front();
+                //Create the struct to hold all the parameters to run the thread
                 struct andArgsr rThread;
-                rThread.leftOrRight         = 0;
-                rThread.paramQuery          = &paramQuery;
-                rThread.originalQuery       = &query;
-                rThread.inputQ              = &tOut.back();
+
+                rThread.originalQuery       = query;
+                rThread.inputQ              = tOut.back();
                 rThread.kbPtr               = &kb;
                 rThread.rbPtr               = this;
-                rThread.varmap              = &varmap;
+                //rThread.varmap              = &varmap;
                 rThread.tempOutput          = &tempOutput;
-                rThread.tracker             = &tracker;
-                rThread.iTracker            = &i;
-                rThread.nTracker            = &n;
+                rThread.result              = &result;
+                rThread.datamutex           = &datamutex;
 
                 ANDThreadR * thread2 = new ANDThreadR(NULL, &rThread);
                 thread2->start();
                 threadmanager.push_back(thread2);
 
-                threadOut.pop_front();
             }
         }
+        //Wait for all the threads to finish so the result deque isn't incomplete
         for(int i = 0; i < threadmanager.size(); i++){
             threadmanager[i]->waitForRunToFinish();
         }
-
-
-        //More efficient searching for the complete result
-        //Keep track of the results in output that match in tempOutput using the tracker map
-        //the tracker map stores the output index with the matching fact as the key and
-        //a vector of matching indices in tempOutput that match with the key index in output
-        //Can switch one variable now with 2 parameters.
-        for(int i = 0; i < tOut.size(); i++){
-            for(int j = 0; j < tempOutput.size(); j++){
-                if(tOut[i].parameters[1].compare(tempOutput[j].parameters[0]) == 0){
-                    tracker[i].push_back(j);
-                }
-            }
-        }
-        for(int i = 0; i < tOut.size(); i++){
-            auto it = tracker.find(i);
-            if(it != tracker.end()){
-                count = it->second.size();
-                for(int j = 0; j < count; j++){
-                    Query q;
-                    q.name = query.name;
-                    q.parameters.push_back(tOut[i].parameters[0]);
-                    q.parameters.push_back(tempOutput[it->second[0]].parameters[1]);
-                    it->second.erase(it->second.begin());
-                    result.push_back(q);
-                }
-            }
-        }
+        //Push all the results into the output deque just in case theres already results saved in output
         for(int i = 0; i < result.size(); i++){
             output.push_back(result[i]);
         }

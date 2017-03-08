@@ -12,8 +12,8 @@ class RuleBase;
 
 struct andArgs{
     int leftOrRight; //0 or 1 depending on side
-    Query* paramQuery;
-    Query* originalQuery;
+    Query paramQuery;
+    Query originalQuery;
     deque<Query>* tOut;
     KnowledgeBase* kbPtr;
     RuleBase *rbPtr;

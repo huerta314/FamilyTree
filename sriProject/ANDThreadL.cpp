@@ -10,16 +10,18 @@ ANDThreadL::ANDThreadL(void *(*_threadRoutine) (void *), void * args):Thread(_th
 
 void * ANDThreadL::threadMainBody(void *){
     deque<string> tempOR;
-    
+    andArgsl.paramQuery.command = "INFERENCE";
+    andArgsl.paramQuery.parameters.push_back(andArgsl.originalQuery.parameters[0]);
+    andArgsl.paramQuery.parameters.push_back(andArgsl.originalQuery.ruleParams[0][1]);
    //First half of the AND operator is the same as the OR operator just call it searching for either a rule or fact
-    if(andArgsl.rbPtr->setRuleIdent(*(andArgsl.paramQuery), andArgsl.originalQuery->ruleParamName[0]))
-        andArgsl.rbPtr->QueryRule(*(andArgsl.paramQuery), *(andArgsl.tOut), *(andArgsl.kbPtr));
+    if(andArgsl.rbPtr->setRuleIdent(andArgsl.paramQuery, andArgsl.originalQuery.ruleParamName[0]))
+        andArgsl.rbPtr->QueryRule((andArgsl.paramQuery), *(andArgsl.tOut), *(andArgsl.kbPtr));
     else{
         //Queries the rule base with the same first parameter of the inference
-        tempOR.push_back(andArgsl.originalQuery->parameters[0]);
-        tempOR.push_back(andArgsl.originalQuery->ruleParams[0][1]);
+        tempOR.push_back(andArgsl.originalQuery.parameters[0]);
+        tempOR.push_back(andArgsl.originalQuery.ruleParams[0][1]);
         
-        andArgsl.kbPtr->QueryFact( andArgsl.rbPtr->createFactQuery(andArgsl.originalQuery->ruleParamName[0], tempOR), *(andArgsl.tOut));
+        andArgsl.kbPtr->QueryFact( andArgsl.rbPtr->createFactQuery(andArgsl.originalQuery.ruleParamName[0], tempOR), *(andArgsl.tOut));
         
     }
     pthread_mutex_unlock(&mutex);
