@@ -9,6 +9,10 @@ ANDThreadL::ANDThreadL(void *(*_threadRoutine) (void *), void * args):Thread(_th
 }
 
 void * ANDThreadL::threadMainBody(void *){
+    pthread_mutex_lock(andArgsl.printmutex);
+    cout<<"Starting ANDThreadL Thread "<<andArgsl.id<<endl;
+    pthread_mutex_unlock(andArgsl.printmutex);
+    
     deque<string> tempOR;
     andArgsl.paramQuery.command = "INFERENCE";
     andArgsl.paramQuery.parameters.push_back(andArgsl.originalQuery.parameters[0]);
@@ -27,4 +31,8 @@ void * ANDThreadL::threadMainBody(void *){
     pthread_mutex_unlock(&mutex);
 }
 
-ANDThreadL::~ANDThreadL(){}
+ANDThreadL::~ANDThreadL(){
+    pthread_mutex_lock(andArgsl.printmutex);
+    cout<<"Ending ANDThreadL Thread "<<andArgsl.id<<endl;
+    pthread_mutex_unlock(andArgsl.printmutex);
+}

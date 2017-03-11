@@ -11,5 +11,8 @@ sriProject: main.cpp Dumper.cpp Interface.cpp KnowledgeBase.cpp Parser.cpp Query
 	ORThread.cpp				\
 	Thread.cpp					\
 	ANDThreadL.cpp				\
-	ANDThreadR.cpp
+	ANDThreadR.cpp				\
+	socket/TCPServerSocket.cpp	\
+	socket/TCPSocket.cpp		
+	
 

@@ -14,7 +14,8 @@ typedef struct varPair varPairT;
 
 
 struct andArgsr{
-    int leftOrRight; //0 or 1 depending on side
+    int                     leftOrRight; //0 or 1 depending on side
+    int                     id;
     Query                   originalQuery;
     Query                   inputQ;
     KnowledgeBase*          kbPtr;
@@ -22,11 +23,12 @@ struct andArgsr{
     deque<Query>*           tempOutput;
     deque<Query>*           result;
     pthread_mutex_t*        datamutex;
+    pthread_mutex_t*        printmutex;
    
     
     andArgsr(void * container){
         andArgsr *unpack  = (andArgsr*) container;
-        
+        id              = unpack->id;
         originalQuery   = unpack->originalQuery;
         inputQ          = unpack->inputQ;
         kbPtr           = unpack->kbPtr;
@@ -34,6 +36,7 @@ struct andArgsr{
         tempOutput      = unpack->tempOutput;
         result          = unpack->result;
         datamutex       = unpack->datamutex;
+        printmutex      = unpack->printmutex;
     }
     andArgsr(){}
 };

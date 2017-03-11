@@ -8,10 +8,17 @@ ANDThreadR::ANDThreadR(void *(*_threadRoutine) (void *), void * args):Thread(_th
     //pthread_mutex_init(&datamutex,NULL);
 }
 
-ANDThreadR::~ANDThreadR(){}
+ANDThreadR::~ANDThreadR(){
+    pthread_mutex_lock(andArgsR.printmutex);
+    cout<<"Ending ANDThreadR Thread "<<andArgsR.id<<endl;
+    pthread_mutex_unlock(andArgsR.printmutex);
+}
 
 
 void * ANDThreadR::threadMainBody(void * args){
+    pthread_mutex_lock(andArgsR.printmutex);
+    cout<<"Starting ANDThreadR Thread "<<andArgsR.id<<endl;
+    pthread_mutex_unlock(andArgsR.printmutex);
     //Constructs a second query object with the name of the second half of the rule and the matching parameter between
     //both subrules and replaces it with the result of the left half of the expression. Then queries it into the rule/fact base
     Query constructedSecondParam;
@@ -21,16 +28,7 @@ void * ANDThreadR::threadMainBody(void * args){
 
     constructedSecondParam.flag = 1;
     deque<Query> tempOutput;
-    /* Not needed anymore
-    //
-    for(int j = 0; j < andArgsR.originalQuery.ruleParams[1].size(); j++){
-        auto it = andArgsR.varmap->find(andArgsR.originalQuery.ruleParams[1][j]);
-        if(it != andArgsR.varmap->end()){
-            constructedSecondParam.parameters[j] = andArgsR.inputQ.parameters[ andArgsR.varmap->operator[]( andArgsR.originalQuery.ruleParams[1][j] ) .origParam ];
-        }
-    }
-    constructedSecondParam.parameters[1] = andArgsR.originalQuery.parameters[1];
-    */
+
     if(andArgsR.rbPtr->setSecondIdent( constructedSecondParam, constructedSecondParam.name)){
         andArgsR.rbPtr->QueryRule(constructedSecondParam, tempOutput, *(andArgsR.kbPtr) );
     }

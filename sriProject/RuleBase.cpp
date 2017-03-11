@@ -2,8 +2,9 @@
 
 
 RuleBase::RuleBase(){
-    
-    
+    id = 2;                                 //ID starts at 2 because the main program is on Thread 1
+    pthread_mutex_init(&datamutex,NULL);
+    pthread_mutex_init(&printmutex,NULL);
 }
 
 RuleBase::~RuleBase(){
@@ -28,19 +29,6 @@ int RuleBase::RemoveRule(Query query){
     if (it != ruleContainer.end() )
         ruleContainer[query.name].clear();
         ruleContainer.erase(it);
-        
-    /*
-    if(query.parameters.size() == 0){
-        ruleContainer[query.name].clear();
-        ruleContainer.erase(query.name);
-    }
-    else{
-        for(int i = 0; i < ruleContainer[query.name].size(); i++){
-            if(ruleContainer[query.name][i].parameters == query.parameters) 
-                ruleContainer[query.name].erase(ruleContainer[query.name].begin()+(i-1));
-        }
-    }
-    */
 }
 
 /*
@@ -140,24 +128,9 @@ Query RuleBase::createFactQuery(string name, deque<string> parameters){
     return query;
 }
 
-/*Not needed anymore
-Creates a map of the string variables in the left rule as the key and
-the right rule is matched to a key, if a key is found it wil insert the index
-the matching variable was found in and storing it in a map.
-
-map<string, varPairT> RuleBase::setParamIndex(Query query){
-    map<string,varPairT > varmap;
-    for(int i = 0; i < query.ruleParams[0].size(); i++){
-        varmap[query.ruleParams[0][i]].origParam = i;
-    }
-    for(int i = 0; i < query.ruleParams[1].size(); i++){
-        auto it = varmap.find(query.ruleParams[1][i]);
-        if(it != varmap.end())
-            varmap[query.ruleParams[1][i]].newParam = i;
-    }
-    return varmap;
-}*/
-
+/*
+Recursive function to query rules
+*/
 int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
     
     Query paramQuery;           //Temporary query used by OR to search for more rules
@@ -175,21 +148,25 @@ int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
     */
     if(query.ruleIdent.compare("OR") == 0){
         //Create the struct to hold all the parameters to run the thread
-        struct orArgs rThread;
-        rThread.leftOrRight = 0;
-        rThread.paramQuery = paramQuery;
-        rThread.originalQuery = query;
-        rThread.tOut = &tOut;
-        rThread.kbPtr = &kb;
-        rThread.rbPtr = this;
+        struct orArgs           rThread;
+        rThread.leftOrRight     = 0;
+        rThread.paramQuery      = paramQuery;
+        rThread.originalQuery   = query;
+        rThread.tOut            = &tOut;
+        rThread.kbPtr           = &kb;
+        rThread.rbPtr           = this;
+        rThread.id              = id++;
+        rThread.printmutex      = &printmutex;
         
         struct orArgs lThread;
-        lThread.leftOrRight = 1;
-        lThread.paramQuery = paramQuery;
-        lThread.originalQuery = query;
-        lThread.tOut = &tOut;
-        lThread.kbPtr = &kb;
-        lThread.rbPtr = this;
+        lThread.leftOrRight     = 1;
+        lThread.paramQuery      = paramQuery;
+        lThread.originalQuery   = query;
+        lThread.tOut            = &tOut;
+        lThread.kbPtr           = &kb;
+        lThread.rbPtr           = this;
+        lThread.id              = id++;
+        lThread.printmutex      = &printmutex;
         
         ORThread a(NULL, &rThread);
         ORThread * thread = &a;
@@ -227,6 +204,8 @@ int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
         lThread.tOut            = &threadOut;
         lThread.kbPtr           = &kb;
         lThread.rbPtr           = this;
+        lThread.id              = id++;
+        lThread.printmutex      = &printmutex;
         
         ANDThreadL b(NULL,&lThread);
         ANDThreadL * thread1 = &b;
@@ -234,8 +213,6 @@ int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
         thread1->start();
         threadmanager.push_back(thread1);
         
-        pthread_mutex_t datamutex;
-        pthread_mutex_init(&datamutex,NULL);
         while(thread1->isRunning() || ( threadOut.size() != 0)){
             if(threadOut.size() > 0){
                 tOut.push_back(threadOut.front());
@@ -247,10 +224,11 @@ int RuleBase::QueryRule(Query query, deque<Query>& output,KnowledgeBase kb){
                 rThread.inputQ              = tOut.back();
                 rThread.kbPtr               = &kb;
                 rThread.rbPtr               = this;
-                //rThread.varmap              = &varmap;
                 rThread.tempOutput          = &tempOutput;
                 rThread.result              = &result;
                 rThread.datamutex           = &datamutex;
+                rThread.id                  = id++;
+                rThread.printmutex          = &printmutex;
 
                 ANDThreadR * thread2 = new ANDThreadR(NULL, &rThread);
                 thread2->start();

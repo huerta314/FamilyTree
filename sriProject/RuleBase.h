@@ -30,6 +30,9 @@ class RuleBase{
 private:
 	map<string, deque<Query> > ruleContainer;						//A map with the Rule name as the key and a deque of 
 																	//query objects to hold all the paramters that the rule has
+	int							id;									//Thread ID counter
+	pthread_mutex_t 			datamutex;							//ANDThreadR mutex for when they want to insert into the result deque
+	pthread_mutex_t				printmutex;							//Mutex so that all the threads will not overlap print statements
 public:
 	int 	AddRule(Query query);									//Adds a rule into the database
 	int 	RemoveRule(Query query);								//Removes a rule by name
